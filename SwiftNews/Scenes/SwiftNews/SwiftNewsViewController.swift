@@ -65,7 +65,6 @@ class SwiftNewsViewController: UICollectionViewController {
     
     private func setupCollectionView() {
 
-//        collectionView?.collectionViewLayout = layout
         let nib = UINib(nibName: CellIdentifiers.collectionViewCellNib.rawValue, bundle: nil)
         collectionView?.register(nib, forCellWithReuseIdentifier: CellIdentifiers.collectionViewCell.rawValue)
         if let flowLayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
@@ -89,17 +88,6 @@ class SwiftNewsViewController: UICollectionViewController {
                 router.perform(selector, with: segue)
             }
         }
-    }
-}
-
-// MARK: Private
-
-extension SwiftNewsViewController {
-    
-    func fetchNewsList() {
-        
-        let request = SwiftNewsModels.NewsFetched.Request()
-        interactor?.fetchSwiftNews(request: request)
     }
 }
 
@@ -153,9 +141,8 @@ extension SwiftNewsViewController {
             let urlString = newsData.imageURL
             if let url = URL(string: urlString), urlString.isURL(), urlString.isImage() {
                 cell.imageView?.kf.setImage(with: url, placeholder: nil, options: nil, progressBlock: nil, completionHandler: { (_) in
-                    collectionView.reloadItems(at: [indexPath])
+                    self.setupCollectionViewCellAfterImageDownloaded()
                 })
-
                 cell.imageView.isHidden = false
             } else {
                 cell.imageView.isHidden = true
@@ -165,4 +152,21 @@ extension SwiftNewsViewController {
         return cell
     }
   
+}
+
+// MARK: Private
+
+extension SwiftNewsViewController {
+    
+    func fetchNewsList() {
+        
+        let request = SwiftNewsModels.NewsFetched.Request()
+        interactor?.fetchSwiftNews(request: request)
+    }
+    
+    func setupCollectionViewCellAfterImageDownloaded() {
+        let visibleCells = self.collectionView.indexPathsForVisibleItems
+        let visibleSections = IndexSet.init(visibleCells.map { $0.section })
+        collectionView.reloadSections(visibleSections)
+    }
 }

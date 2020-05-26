@@ -12,11 +12,8 @@ import UIKit
 class SwiftNewsCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var containerView: UIView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        self.containerView?.layer.cornerRadius = 10
-        self.containerView?.layer.masksToBounds = true
     }
 }
