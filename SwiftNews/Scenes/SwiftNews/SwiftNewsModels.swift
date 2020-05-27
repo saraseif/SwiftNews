@@ -15,19 +15,15 @@ enum SwiftNewsModels {
         struct Request {}
         
         struct Response {
-            var newsListData: MainInfoData?
+            var newsInfoData: MainInfoData?
             var error: Error?
-        }
-        
-        struct NewsViewModel {
-            let title: String
-            let imageURL: String
         }
         
         struct NewsListViewModel {
             var pageTitle: String
             var numberOfSections: Int?
             var newsList: [Int: [NewsViewModel]]
+            var newsDetailsViewModel:  [Int: [NewsData]]
         }
     }
     
@@ -35,5 +31,11 @@ enum SwiftNewsModels {
         struct ViewModel {
             let error: String
         }
+    }
+    
+    struct NewsViewModel {
+        let title: String
+        let imageURL: String
+        let description: String?
     }
 }

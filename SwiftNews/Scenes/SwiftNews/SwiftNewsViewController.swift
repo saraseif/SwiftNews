@@ -14,6 +14,7 @@ protocol SwiftNewsDisplayLogic: class {
     
     func displayNews(viewModel: SwiftNewsModels.NewsFetched.NewsListViewModel)
     func displayError(viewModel: SwiftNewsModels.NewsFetchError.ViewModel)
+    func routeToNewsDetails()
 }
 
 class SwiftNewsViewController: UICollectionViewController {
@@ -94,16 +95,16 @@ class SwiftNewsViewController: UICollectionViewController {
 // MARK: Display logic
 
 extension SwiftNewsViewController: SwiftNewsDisplayLogic  {
+
     func displayNews(viewModel: SwiftNewsModels.NewsFetched.NewsListViewModel) {
         self.viewModel = viewModel
-                   self.navigationItem.title = viewModel.pageTitle
+        self.navigationItem.title = viewModel.pageTitle
         
         self.collectionView?.reloadData()
     }
     
     func displayError(viewModel: SwiftNewsModels.NewsFetchError.ViewModel) {
         let alert = UIAlertController(
-            
             title: "Error",
             message: viewModel.error,
             preferredStyle: .alert
@@ -114,6 +115,11 @@ extension SwiftNewsViewController: SwiftNewsDisplayLogic  {
         }))
         present(alert, animated: true, completion: nil)
     }
+    
+    func routeToNewsDetails() {
+        router?.routeToDetailsScene()
+    }
+    
 }
 
 // MARK: Table View delegates
@@ -151,7 +157,14 @@ extension SwiftNewsViewController {
         
         return cell
     }
-  
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let newsList = viewModel?.newsDetailsViewModel[indexPath.section] {
+            let newsData = newsList[indexPath.row]
+            interactor?.setNewsDetails(newsDetails: newsData)
+        }
+    }
+    
 }
 
 // MARK: Private

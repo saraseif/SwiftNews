@@ -10,7 +10,7 @@
         <scene sceneID="oqn-af-fAQ">
             <objects>
                 <collectionViewController id="jJN-2N-dhl" customClass="SwiftNewsViewController" customModule="SwiftNews" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="JfA-f8-oh7">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" dataMode="prototypes" id="JfA-f8-oh7">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>

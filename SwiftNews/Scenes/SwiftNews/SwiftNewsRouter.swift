@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 @objc protocol SwiftNewsRoutingLogic {
-    func routeToDetailsScene(segue: UIStoryboardSegue?)
+    func routeToDetailsScene()
 }
 
 protocol SwiftNewsDataPassing {
@@ -24,16 +24,10 @@ class SwiftNewsRouter: NSObject, SwiftNewsRoutingLogic, SwiftNewsDataPassing {
     
     // MARK: Routing
     
-    func routeToDetailsScene(segue: UIStoryboardSegue?) {
+    func routeToDetailsScene() {
+        let newsDetailsViewController = NewsDetailsViewController()
+        newsDetailsViewController.router?.dataStore?.newsDetails = dataStore?.newsDetails
+        viewController?.navigationController?.pushViewController(newsDetailsViewController, animated: true)
         
-        if let _ = segue {
-            
-            // Do nothing for now, because container view would not be open using Segues for current structure.
-            
-        } else {
-            
-            let destinationVC = viewController?.navigationController?.parent as! NewsDetailsViewController
-            
-        }
     }
 }

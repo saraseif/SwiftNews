@@ -11,24 +11,17 @@ import Foundation
 protocol SwiftNewsBusinessLogic {
     
     func fetchSwiftNews(request: SwiftNewsModels.NewsFetched.Request)
+    func setNewsDetails(newsDetails: NewsData)
 }
 
 protocol SwiftNewsDataStore {
-    
-    var newsCode: String? { get set }
+    var newsDetails: NewsData? { get set }
 }
 
 class SwiftNewsInteractor: SwiftNewsBusinessLogic, SwiftNewsDataStore {
-
+    var newsDetails: NewsData?
     var presenter: SwiftNewsPresentationLogic?
     var worker: NewsWorker = NewsWorker()
-    var newsCode: String? {
-        
-        didSet {
-            
-            fetchSwiftNews(request: SwiftNewsModels.NewsFetched.Request())
-        }
-    }
 
     // MARK: Do something
     
@@ -36,8 +29,13 @@ class SwiftNewsInteractor: SwiftNewsBusinessLogic, SwiftNewsDataStore {
             
         worker.fetchNews(completion: { (mainInfo, error) in
             
-            let response = SwiftNewsModels.NewsFetched.Response(newsListData: mainInfo, error: error)
+            let response = SwiftNewsModels.NewsFetched.Response(newsInfoData: mainInfo, error: error)
             self.presenter?.presentSwiftNews(response: response)
         })
+    }
+    
+    func setNewsDetails(newsDetails: NewsData) {
+        self.newsDetails = newsDetails
+        presenter?.presentNewsDetailsSelected()
     }
 }

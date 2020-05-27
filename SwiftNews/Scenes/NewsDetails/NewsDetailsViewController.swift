@@ -11,11 +11,72 @@ import UIKit
 
 protocol NewsDetailsDisplayLogic: class {
     
-    func displayNews(viewModel: SwiftNewsModels.NewsFetched.NewsListViewModel)
-    func displayError(viewModel: SwiftNewsModels.NewsFetchError.ViewModel)
+    func displayLoadScene(viewModel: NewsDetailsModels.LoadScene.NewsViewModel)
 }
 
-class NewsDetailsViewController: UIViewController {
-
+class NewsDetailsViewController: UIViewController, NewsDetailsDisplayLogic {
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var titleLable: UILabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet var imageViewHeightConstraint: NSLayoutConstraint!
+    
+    var interactor: NewsDetailsBusinessLogic?
+    var router: NewsDetailsRouter?
+    var viewModel: NewsDetailsModels.LoadScene.NewsViewModel?
+    let viewControllerNibName = "NewsDetailsViewController"
+    
+    
+    // MARK: Object lifecycle
+    
+    required init()
+    {
+        super.init(nibName: viewControllerNibName, bundle: Bundle.main)
+        setup()
+    }
+    
+    required init?(coder aDecoder: NSCoder)
+    {
+        super.init(coder: aDecoder)
+        setup()
+    }
+    
+    // MARK: Setup
+    
+    private func setup()
+    {
+        let viewController = self
+        let interactor = NewsDetailsInteractor()
+        let presenter = NewsDetailsPresenter()
+        let router = NewsDetailsRouter()
+        viewController.interactor = interactor
+        viewController.router = router
+        interactor.presenter = presenter
+        presenter.viewController = viewController
+        router.viewController = viewController
+        router.dataStore = interactor
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        interactor?.loadScene()
+    }
+    
+    
+    func displayLoadScene(viewModel: NewsDetailsModels.LoadScene.NewsViewModel) {
+        self.navigationItem.title = viewModel.pageTitle
+        self.titleLable.text = viewModel.title
+        self.descriptionLabel.text = viewModel.description
+        if let urlString = viewModel.imageURL {
+            if let url = URL(string: urlString), urlString.isURL(), urlString.isImage() {
+                self.imageView?.kf.setImage(with: url, placeholder: nil, options: nil, progressBlock: nil, completionHandler: { (_) in                })
+            } else {
+                self.imageViewHeightConstraint.constant = 0
+                self.imageView.layoutIfNeeded()
+            }
+        }
+    }
 }
-

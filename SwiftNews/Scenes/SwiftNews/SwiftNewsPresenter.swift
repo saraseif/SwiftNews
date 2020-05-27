@@ -11,16 +11,19 @@ import UIKit
 
 protocol SwiftNewsPresentationLogic {
     func presentSwiftNews(response: SwiftNewsModels.NewsFetched.Response)
+    func presentNewsDetailsSelected()
 }
 
 class SwiftNewsPresenter: SwiftNewsPresentationLogic {
     weak var viewController: SwiftNewsDisplayLogic?
     let maxItemsInRow: Int = 4
+    typealias NewsDetailsViewModel = SwiftNewsModels.NewsViewModel
     
     func presentSwiftNews(response: SwiftNewsModels.NewsFetched.Response) {
         var newsListViewModel: SwiftNewsModels.NewsFetched.NewsListViewModel
-        var newsOrderedDictionary = [Int: [SwiftNewsModels.NewsFetched.NewsViewModel]]()
-        guard response.error == nil, let newsListData = response.newsListData else {
+        var newsOrderedDictionary = [Int: [NewsDetailsViewModel]]()
+        var newsDetailsDictionary = [Int: [NewsData]]()
+        guard response.error == nil, let newsInfoData = response.newsInfoData else {
             
             let viewModel = SwiftNewsModels.NewsFetchError.ViewModel(error: response.error?.localizedDescription ?? "error happened")
             viewController?.displayError(viewModel: viewModel)
@@ -29,27 +32,42 @@ class SwiftNewsPresenter: SwiftNewsPresentationLogic {
         }
                 
         var sectionNumber: Int = 0
-        var sectionList = [SwiftNewsModels.NewsFetched.NewsViewModel]()
-        let totalNewsCount = newsListData.children.count
-        for i in 1...totalNewsCount {
-            if totalNewsCount < maxItemsInRow
-            {
-                continue
-            }
-            else if i != 1, (i-1)%maxItemsInRow == 0 {//|| i-(SwiftNewsPresenter.maxItemsInRow * sectionNumber) < SwiftNewsPresenter.maxItemsInRow {
+        var sectionList = [NewsDetailsViewModel]()
+        var detailsSectionList = [NewsData]()
+        let totalNewsCount = newsInfoData.newsListData.count
+        for i in 0..<totalNewsCount {
+            if totalNewsCount < maxItemsInRow { continue }
+            else if i != 0, i%maxItemsInRow == 0 || totalNewsCount - i < maxItemsInRow {
                 newsOrderedDictionary[sectionNumber] = sectionList
-                sectionNumber = sectionNumber+1
-                sectionList = [SwiftNewsModels.NewsFetched.NewsViewModel]()
+                newsDetailsDictionary[sectionNumber] = detailsSectionList
+                if i%maxItemsInRow == 0 {
+                    sectionNumber = sectionNumber+1
+                    sectionList = [NewsDetailsViewModel]()
+                    detailsSectionList = [NewsData]()
+                }
             }
             
-            let item = newsListData.children[i-1].newsData
-            let newsVM = SwiftNewsModels.NewsFetched.NewsViewModel(title: item.title, imageURL: item.thumbnailURL ?? "")
+            let item = newsInfoData.newsListData[i].newsData
+            detailsSectionList.append(item)
+            
+            let newsVM = SwiftNewsModels.NewsViewModel(title: item.title, imageURL: item.thumbnailURL ?? "", description: item.description)
             sectionList.append(newsVM)
+            
+            if i == totalNewsCount-1 {
+                newsOrderedDictionary[sectionNumber] = sectionList
+                newsDetailsDictionary[sectionNumber] = detailsSectionList
+            }
         }
-        newsListViewModel = SwiftNewsModels.NewsFetched.NewsListViewModel(pageTitle: "Swift Top News", numberOfSections: sectionNumber, newsList: newsOrderedDictionary)
+        newsListViewModel = SwiftNewsModels.NewsFetched.NewsListViewModel(pageTitle: "Swift Top News", numberOfSections: sectionNumber, newsList: newsOrderedDictionary, newsDetailsViewModel: newsDetailsDictionary)
 
         DispatchQueue.main.async {
             self.viewController?.displayNews(viewModel: newsListViewModel)
+        }
+    }
+    
+    func presentNewsDetailsSelected() {
+        DispatchQueue.main.async {
+            self.viewController?.routeToNewsDetails()
         }
     }
     
