@@ -25,21 +25,6 @@ class NewsDetailsViewController: UIViewController, NewsDetailsDisplayLogic {
     var viewModel: NewsDetailsModels.LoadScene.NewsViewModel?
     let viewControllerNibName = "NewsDetailsViewController"
     
-    
-    // MARK: Object lifecycle
-    
-    required init()
-    {
-        super.init(nibName: viewControllerNibName, bundle: Bundle.main)
-        setup()
-    }
-    
-    required init?(coder aDecoder: NSCoder)
-    {
-        super.init(coder: aDecoder)
-        setup()
-    }
-    
     // MARK: Setup
     
     private func setup()
@@ -56,6 +41,20 @@ class NewsDetailsViewController: UIViewController, NewsDetailsDisplayLogic {
         router.dataStore = interactor
     }
     
+    // MARK: Object lifecycle
+    
+    required init()
+    {
+        super.init(nibName: viewControllerNibName, bundle: Bundle.main)
+        setup()
+    }
+    
+    required init?(coder aDecoder: NSCoder)
+    {
+        super.init(coder: aDecoder)
+        setup()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
@@ -65,6 +64,7 @@ class NewsDetailsViewController: UIViewController, NewsDetailsDisplayLogic {
         interactor?.loadScene()
     }
     
+    // MARK: Display logic
     
     func displayLoadScene(viewModel: NewsDetailsModels.LoadScene.NewsViewModel) {
         self.navigationItem.title = viewModel.pageTitle
@@ -72,7 +72,7 @@ class NewsDetailsViewController: UIViewController, NewsDetailsDisplayLogic {
         self.descriptionLabel.text = viewModel.description
         if let urlString = viewModel.imageURL {
             if let url = URL(string: urlString), urlString.isURL(), urlString.isImage() {
-                self.imageView?.kf.setImage(with: url, placeholder: nil, options: nil, progressBlock: nil, completionHandler: { (_) in                })
+                self.imageView?.kf.setImage(with: url)
             } else {
                 self.imageViewHeightConstraint.constant = 0
                 self.imageView.layoutIfNeeded()
